@@ -7,77 +7,70 @@ use Illuminate\Http\Request;
 
 class pelangganController extends Controller
 {
-    // Menampilkan semua data pelanggan
+    // Menampilkan semua pelanggan
     public function index()
     {
-        $pelanggan = Pelanggan::all();
-        return view('pelanggan.index', compact('pelanggan'));  // Menampilkan data pelanggan ke dalam view
+        $pelanggan = pelanggan::all();
+        return view('pelanggan.index', compact('pelanggan'));
     }
 
-    // Menampilkan form untuk membuat pelanggan baru
+    // Menampilkan form untuk menambah pelanggan
     public function create()
     {
-        return view('pelanggan.create');  // Menampilkan form input data pelanggan
+        return view('pelanggan.create');
     }
 
-    // Menyimpan pelanggan baru ke dalam database
+    // Menyimpan pelanggan baru
     public function store(Request $request)
     {
-        // Validasi input
         $request->validate([
             'namaPelanggan' => 'required|string|max:255',
-            'noTlp' => 'required|string|max:15',
-            'email' => 'required|email|max:255',
+            'noTlp' => 'required|integer|unique:pelanggan',
+            'email' => 'string|email|unique:pelanggan',
+            'jumlahPoin' => 'integer',
         ]);
 
-        $pelanggan = new Pelanggan();
-        $pelanggan->namaPelanggan = $request->namaPelanggan;
-        $pelanggan->noTlp = $request->noTlp;
-        $pelanggan->email = $request->email;
-        $pelanggan->save();
+        pelanggan::create($request->all());
 
-        return redirect()->route('pelanggan.index');  // Kembali ke halaman daftar pelanggan
+        return redirect()->route('pelanggan.index');
     }
 
-    // Menampilkan detail pelanggan berdasarkan ID
+    // Menampilkan detail pelanggan
     public function show($id)
     {
-        $pelanggan = Pelanggan::find($id);
-        return view('pelanggan.show', compact('pelanggan'));  // Menampilkan detail pelanggan ke dalam view
+        $pelanggan = pelanggan::findOrFail($id);
+        return view('pelanggan.show', compact('pelanggan'));
     }
 
-    // Menampilkan form untuk mengedit data pelanggan
+    // Menampilkan form untuk mengedit pelanggan
     public function edit($id)
     {
-        $pelanggan = Pelanggan::find($id);
-        return view('pelanggan.edit', compact('pelanggan'));  // Menampilkan form edit
+        $pelanggan = pelanggan::findOrFail($id);
+        return view('pelanggan.edit', compact('pelanggan'));
     }
 
-    // Memperbarui data pelanggan di database
+    // Mengupdate data pelanggan
     public function update(Request $request, $id)
     {
-        // Validasi input
         $request->validate([
             'namaPelanggan' => 'required|string|max:255',
-            'noTlp' => 'required|string|max:15',
-            'email' => 'required|email|max:255',
+            'noTlp' => 'required|integer|unique:pelanggan,noTlp,' . $id,
+            'email' => 'string|email|unique:pelanggan,email,' . $id,
+            'jumlahPoin' => 'integer',
         ]);
 
-        $pelanggan = Pelanggan::find($id);
-        $pelanggan->namaPelanggan = $request->namaPelanggan;
-        $pelanggan->noTlp = $request->noTlp;
-        $pelanggan->email = $request->email;
-        $pelanggan->save();
+        $pelanggan = pelanggan::findOrFail($id);
+        $pelanggan->update($request->all());
 
-        return redirect()->route('pelanggan.index');  // Kembali ke halaman daftar pelanggan
+        return redirect()->route('pelanggan.index');
     }
 
-    // Menghapus data pelanggan
+    // Menghapus pelanggan
     public function destroy($id)
     {
-        $pelanggan = Pelanggan::find($id);
+        $pelanggan = pelanggan::findOrFail($id);
         $pelanggan->delete();
 
-        return redirect()->route('pelanggan.index');  // Kembali ke halaman daftar pelanggan
+        return redirect()->route('pelanggan.index');
     }
 }

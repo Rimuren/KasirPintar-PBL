@@ -2,63 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\poin;
 use Illuminate\Http\Request;
 
 class poinController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $poins = poin::all();
+        return view('poin.index', compact('poins'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('poin.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'min_range' => 'required|integer',
+            'max_range' => 'required|integer',
+            'poin' => 'required|integer',
+        ]);
+
+        poin::create($request->all());
+
+        return redirect()->route('poin.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $poin = poin::findOrFail($id);
+        return view('poin.show', compact('poin'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit($id)
     {
-        //
+        $poin = poin::findOrFail($id);
+        return view('poin.edit', compact('poin'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'min_range' => 'required|integer',
+            'max_range' => 'required|integer',
+            'poin' => 'required|integer',
+        ]);
+
+        $poin = poin::findOrFail($id);
+        $poin->update($request->all());
+
+        return redirect()->route('poin.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $poin = poin::findOrFail($id);
+        $poin->delete();
+
+        return redirect()->route('poin.index');
     }
 }

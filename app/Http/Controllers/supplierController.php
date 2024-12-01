@@ -2,63 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\supplier;
 use Illuminate\Http\Request;
 
 class supplierController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $suppliers = supplier::all();
+        return view('supplier.index', compact('suppliers'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        //
+        return view('supplier.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'namaSupplier' => 'required|string|max:255',
+            'noTlp' => 'required|integer|unique:supplier',
+            'email' => 'required|string|email|unique:supplier',
+        ]);
+
+        supplier::create($request->all());
+
+        return redirect()->route('supplier.index');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $supplier = supplier::findOrFail($id);
+        return view('supplier.show', compact('supplier'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function edit($id)
     {
-        //
+        $supplier = supplier::findOrFail($id);
+        return view('supplier.edit', compact('supplier'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'namaSupplier' => 'required|string|max:255',
+            'noTlp' => 'required|integer|unique:supplier,noTlp,' . $id,
+            'email' => 'required|string|email|unique:supplier,email,' . $id,
+        ]);
+
+        $supplier = supplier::findOrFail($id);
+        $supplier->update($request->all());
+
+        return redirect()->route('supplier.index');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $supplier = Supplier::findOrFail($id);
+        $supplier->delete();
+
+        return redirect()->route('supplier.index');
     }
 }
